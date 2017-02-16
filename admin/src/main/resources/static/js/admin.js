@@ -105,6 +105,14 @@
 	});
 	
 	
+	app.directive('weeksFilter', function() {
+		return {
+			restrict: 'E',
+			templateUrl: 'partials/weeksFilter.html'
+		};
+	});
+	
+	
 	app.factory('leagueService', function ($http, $log) {
 	$log.debug('leagueService');
 		var service =  {
@@ -372,6 +380,38 @@
 //			$scope.leagues = data;
 //			$scope.week.seasonId = data[0].seasonId;
 //		});
+		
+		
+		$scope.weeksBySeason = {};
+		$scope.weeksBySeason.leagueTypes = [];
+		$scope.weeksBySeason.filteredweeks = [];
+		
+		
+		$http.get('/admin/leagues/types').success(function(data) {
+			var arrayLength = data.length;
+			for (var i = 0; i < arrayLength; i++) {
+				$scope.weeksBySeason.leagueTypes.push(data[i]);
+			}
+		});
+		
+		$scope.$watch('weeksBySeason.leagueType', function (newValue, oldValue, scope) {
+		$http.get('/admin/leagues/seasons/leaguetypes/'+$scope.weeksBySeason.leagueType).success(function(data) {
+			$scope.weeksBySeason.allseasons = data;
+		});
+		});
+		
+		
+		$scope.$watch('weeksBySeason.seasonId', function (newValue, oldValue, scope) {
+//			console.log($scope.weeksBySeason.seasonId);
+			$scope.weeksBySeason.filteredweeks = [];
+			$http.get('/admin/weeks/seasonid/'+$scope.weeksBySeason.seasonId).success(function(data) {
+//				console.log(data);
+				var arrayLength = data.length;
+				for (var i = 0; i < arrayLength; i++) {
+					$scope.weeksBySeason.filteredweeks.push(data[i]);
+					}
+			});
+	  });
 		
 		$http.get('/admin/leagues/seasons/current').success(function(data) {
 			$scope.seasons = data;

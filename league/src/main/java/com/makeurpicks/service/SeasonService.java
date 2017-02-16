@@ -58,4 +58,8 @@ public class SeasonService {
 	{
 		seasonRepository.delete(seasonId);
 	}
+	
+	public List<Season> getSeasonsByLeagueType(String leagueType) {
+		return seasonRepository.findByLeagueType(leagueType);
+	}
 }

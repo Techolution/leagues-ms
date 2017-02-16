@@ -11,5 +11,6 @@ public interface SeasonRepository extends Repository<Season, String> {//CrudRepo
 	public List<Season> getSeasonsByLeagueType(String leaueType);
 	public Season save(Season season);
 	public void delete(String seasonId);
+	public List<Season> findByLeagueType(String leagueType);
 	
 }
