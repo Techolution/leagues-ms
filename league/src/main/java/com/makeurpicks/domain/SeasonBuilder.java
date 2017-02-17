@@ -8,20 +8,16 @@ public class SeasonBuilder {
 	private int startYear;
 	private int endYear;
 	private String leagueType;
-	
-	public SeasonBuilder()
-	{
-		
+
+	public SeasonBuilder() {
 		this.id = UUID.randomUUID().toString();
 	}
-	
-	public SeasonBuilder(String id)
-	{
+
+	public SeasonBuilder(String id) {
 		this.id = id;
 	}
-	
-	public Season build()
-	{
+
+	public Season build() {
 		Season season = new Season();
 		season.setId(id);
 		season.setEndYear(endYear);
@@ -29,23 +25,20 @@ public class SeasonBuilder {
 		season.setLeagueType(leagueType);
 		return season;
 	}
-	
-	public SeasonBuilder withStartYear(int s)
-	{
-		this.startYear = s;
+
+	public SeasonBuilder withStartYear(int startYear) {
+		this.startYear = startYear;
 		return this;
 	}
-	
-	public SeasonBuilder withEndYear(int e)
-	{
-		this.endYear = e;
+
+	public SeasonBuilder withEndYear(int endYear) {
+		this.endYear = endYear;
 		return this;
 	}
-	
-	public SeasonBuilder withLeagueType(LeagueType leagueType)
-	{
+
+	public SeasonBuilder withLeagueType(LeagueType leagueType) {
 		this.leagueType = leagueType.toString();
 		return this;
 	}
-	
+
 }

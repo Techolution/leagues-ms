@@ -36,7 +36,6 @@ public class League {
 	private String seasonId;
 	private String adminId;
 
-
 	public String getId() {
 		return id;
 	}

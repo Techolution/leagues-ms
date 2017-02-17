@@ -44,3 +44,9 @@ config-repo/
 RemoteSystemsTempFiles/
 .metadata/
 .recommenders/
+
+# Workspace
+######################
+.classpath
+.project
+.settings

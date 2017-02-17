@@ -2,24 +2,20 @@ server:
   port: 8081
   context-path: /leagues
 security.user.password: testme
-#security.user.password: dinesh
 spring:
-  profiles:
-    active: container
+#  profiles:
+#    active: dev
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
   datasource:
-#    url: jdbc:mysql://localhost:3304/league
-#    username: root
-#    password: admin123
-    url: jdbc:mysql://localhost:3306/cf_0619e413_5337_476d_98b7_2e1d996aa224
-    username: root
-    password: admin123
+    url: jdbc:mysql://localhost:3304/league
+    username: dbuser
+    password: password
     driver-class-name: com.mysql.jdbc.Driver
 security:
   oauth2:
@@ -30,11 +26,9 @@ security:
     enabled: false
   user:
     name: admin
-#      userInfoUri: http://localhost:9999/auth/user
 logging:
   level:
     com.makeurpicks: DEBUG
-#    org.springframework.security: DEBUG
 ---    
 spring:
   profiles: container
@@ -106,7 +100,7 @@ spring:
       time-between-eviction-runs-millis: 3600000
 ---    
 spring:
-  profiles: testpcf
+  profiles: testlocal
   jpa:
     show-sql: true
     hibernate:
@@ -115,7 +109,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
   datasource:
-    url: jdbc:mysql://40.121.212.183:${vcap.services.p-mysql.[0].credentials.port:3306}/${vcap.services.p-mysql.[0].credentials.name:cf_0619e413_5337_476d_98b7_2e1d996aa224}?autoReconnect=true
-    username: ${vcap.services.p-mysql.[0].credentials.username:v3UBiVC4yFOPqQRX}
-    password: ${vcap.services.p-mysql.[0].credentials.password:6Hma540BY1h5R1i6}
-    driver-class-name: com.mysql.jdbc.Driver    
+    url: jdbc:mysql://localhost:${vcap.services.p-mysql.[0].credentials.port:3303}/${vcap.services.p-mysql.[0].credentials.name:league}?autoReconnect=true
+    username: ${vcap.services.p-mysql.[0].credentials.username:dbuser}
+    password: ${vcap.services.p-mysql.[0].credentials.password:password}
+    driver-class-name: com.mysql.jdbc.Driver

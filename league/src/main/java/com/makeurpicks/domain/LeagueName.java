@@ -7,44 +7,37 @@ public class LeagueName implements Serializable {
 	private String leagueName;
 	private String leagueId;
 	private String seasonId;
-	
-	public LeagueName()
-	{
-		
+
+	public LeagueName() {
+
 	}
-	
-	
-	
-	public LeagueName(League league)
-	{
+
+	public LeagueName(League league) {
 		this.leagueName = league.getLeagueName();
 		this.leagueId = league.getId();
 		this.seasonId = league.getSeasonId();
 	}
-	
-	 
-	
+
 	public String getSeasonId() {
 		return seasonId;
 	}
-
-
 
 	public void setSeasonId(String seasonId) {
 		this.seasonId = seasonId;
 	}
 
-
-
 	public String getLeagueName() {
 		return leagueName;
 	}
+
 	public void setLeagueName(String leagueName) {
 		this.leagueName = leagueName;
 	}
+
 	public String getLeagueId() {
 		return leagueId;
 	}
+
 	public void setLeagueId(String leagueId) {
 		this.leagueId = leagueId;
 	}
@@ -53,8 +46,7 @@ public class LeagueName implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((leagueId == null) ? 0 : leagueId.hashCode());
+		result = prime * result + ((leagueId == null) ? 0 : leagueId.hashCode());
 		return result;
 	}
 
@@ -74,6 +66,5 @@ public class LeagueName implements Serializable {
 			return false;
 		return true;
 	}
-	
-	
+
 }
