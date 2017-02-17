@@ -26,20 +26,20 @@ services:
       - "3303:3306"
     expose:
       - "3303"
-  auth-server:
-    build: ../auth-server/
-    networks:
-      - myp-network
-    ports:
-      - "9999:9999"
-    expose:
-      - "9999"
-    restart: always      
-    links:
-      - auth-db:auth-db
-    depends_on:
-      - auth-db
-      - eureka
+#  auth-server:
+#    build: ../auth-server/
+#    networks:
+#      - myp-network
+#    ports:
+#      - "9999:9999"
+#    expose:
+#      - "9999"
+#    restart: always      
+#    links:
+#      - auth-db:auth-db
+#    depends_on:
+#      - auth-db
+#      - eureka
   config-server:
     build: ../server-config/
     networks:
@@ -48,58 +48,58 @@ services:
       - "8888:8888"
     expose:
       - "8888"
-  admin:
-    build: ../admin/
-    networks:
-      - myp-network
-    ports:
-      - "9000:9000"
-    expose:
-      - "9000"
-    links:
-      - eureka:eureka
-      - auth-server:auth-server
-      - config-server:config-server
-    depends_on:
-      - eureka
-      - auth-server
-      - config-server
-    restart: always
-  league:
-    build: ../league/
-    networks:
-      - myp-network
-    ports:
-      - "8081:8081"
-    expose:
-      - "8081"
-    restart: always
-    links:
-      - eureka:eureka
-      - auth-server:auth-server
-      - config-server:config-server
-      - league-db:league-db
-    depends_on:
-      - eureka
-      - auth-server
-      - config-server
-      - league-db
-#  game-db:  
-#    image: mysql:latest
-#    environment:
-#      - MYSQL_ROOT_PASSWORD=admin123
-#      - MYSQL_USER=dbuser
-#      - MYSQL_PASSWORD=password
-#      - MYSQL_DATABASE=game
-##    volumes:
-##      - mysql-data:/home.scripts  
-##    working_dir: "/home/scripts"
+#  admin:
+#    build: ../admin/
 #    networks:
 #      - myp-network
 #    ports:
-#      - "3305:3306"
+#      - "9000:9000"
 #    expose:
-#      - "3305"    
+#      - "9000"
+#    links:
+#      - eureka:eureka
+#      - auth-server:auth-server
+#      - config-server:config-server
+#    depends_on:
+#      - eureka
+#      - auth-server
+#      - config-server
+#    restart: always
+#  league:
+#    build: ../league/
+#    networks:
+#      - myp-network
+#    ports:
+#      - "8081:8081"
+#    expose:
+#      - "8081"
+#    restart: always
+#    links:
+#      - eureka:eureka
+#      - auth-server:auth-server
+#      - config-server:config-server
+#      - league-db:league-db
+#    depends_on:
+#      - eureka
+#      - auth-server
+#      - config-server
+#      - league-db
+  game-db:  
+    image: mysql:latest
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin123
+      - MYSQL_USER=dbuser
+      - MYSQL_PASSWORD=password
+      - MYSQL_DATABASE=game
+##    volumes:
+##      - mysql-data:/home.scripts  
+##    working_dir: "/home/scripts"
+    networks:
+      - myp-network
+    ports:
+      - "3305:3306"
+    expose:
+      - "3305"    
   league-db:  
     image: mysql:latest
     environment:
@@ -113,14 +113,14 @@ services:
       - "3304:3306"
     expose:
       - "3304"    
-#  redis:
-#    image: redis
-#    networks:
-#      - myp-network
-#    ports:
-#      - "6379:6379"
-#    expose:
-#      - "6379"
+  redis:
+    image: redis
+    networks:
+      - myp-network
+    ports:
+      - "6379:6379"
+    expose:
+      - "6379"
                 
 networks:
   myp-network:

@@ -12,7 +12,8 @@ security:
       userInfoUri: http://localhost:8080/uaa/user
 
 logging:
-  level: org.springframework.security=DEBUG
+  level: 
+   org.springframework.security : DEBUG
 
 zuul:
   ignoredServices: '*'

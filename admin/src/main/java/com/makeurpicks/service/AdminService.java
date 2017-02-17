@@ -3,6 +3,8 @@ package com.makeurpicks.service;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +37,8 @@ public class AdminService {
 	
 	@Autowired
 	private PickIntegrationService pickIntegrationService;
+	
+	Log log = LogFactory.getLog(AdminService.class);
 	
 	public List<SeasonView> getSeasons() {
 		return seasonIntegrationService.getCurrentSeasons();

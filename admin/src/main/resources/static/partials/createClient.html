@@ -1,0 +1,56 @@
+<form name="createClient" ng-submit="createClientCtrl.addClient()" class="form-horizontal">
+<fieldset>
+	
+	<div class="form-group">
+		<label for="start-input" class="col-lg-2 control-label">Client Name</label>
+		<div class="col-lg-10">
+			<input ng-model="client.name" required id="start-input" class="form-control" value=""/>
+		</div>
+	</div> 
+	<!-- <div class="form-group">
+		<label for="end-input" class="col-lg-2 control-label">OAuth Token</label>
+		<div class="col-lg-10">
+			<input ng-model="client.oauthtoken" required id="end-input" class="form-control" value=""/>
+		</div>
+	</div> -->
+	<div class="form-group">
+		<label for="end-input" class="col-lg-2 control-label">Authentication</label>
+		<div class="col-lg-10">
+			<input ng-model="client.authentication" required id="end-input" class="form-control" value=""/>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="end-input" class="col-lg-2 control-label">Authentication Id</label>
+		<div class="col-lg-10">
+			<input ng-model="client.authenticationid"  id="end-input" class="form-control" value=""/>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="end-input" class="col-lg-2 control-label">Client Id</label>
+		<div class="col-lg-10">
+			<input ng-model="client.clientid"  id="end-input" class="form-control" value=""/>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="end-input" class="col-lg-2 control-label">Client Secret</label>
+		<div class="col-lg-10">
+			<input ng-model="client.clientsecret"  id="end-input" class="form-control" value=""/>
+		</div>
+	</div>
+<!-- 	<div class="form-group">
+			 <label for="leaguetype-input"
+				class="col-lg-2 control-label">League Type</label>
+			<div class="col-lg-10">
+			<select ng-model="season.leagueType" required id="leaguetype-input" class="form-control" ng-options="x for x in season.leagueTypes">
+			</select>  -->
+			<!-- <input ng-model="season.leagueType" required id="leaguetype-input" class="form-control" value="pickem"/> -->
+	<!-- 	</div>
+	</div> -->
+	<div class="form-group">
+   		<div class="col-lg-10 col-lg-offset-2">
+   			<button class="btn btn-primary">Add Client</button>
+   		</div>
+   		
+   	</div>
+</fieldset>
+</form>

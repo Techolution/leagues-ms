@@ -2,6 +2,8 @@ package com.makeurpicks.controller;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,10 +23,13 @@ public class SeasonController {
 
 	@Autowired
 	private SeasonService seasonService;
+	
+	Log log =  LogFactory.getLog(SeasonController.class);
 		
 	@RequestMapping(method=RequestMethod.GET, value="/current")
 	public @ResponseBody List<Season> getCurrentSeasons()
 	{
+		log.debug("Season Control ----- ");
 		return seasonService.getCurrentSeasons();
 	}
 	
