@@ -92,6 +92,37 @@ public class WeekServiceTest {
 		assertTrue(weeks.contains(weeka));
 		assertTrue(weeks.contains(weekb));
 	}
+	
+
+	@Test
+	public void testGetWeeksBySeasonWhichDoesNotExist() {
+
+		String weekId22017 = UUID.randomUUID().toString();
+		List<Week> weeks22017 = new ArrayList<>();
+
+		// find a week which doesn't exist and it should return empty list
+		when(weekRepository.findBySeasonId(weekId22017)).thenReturn(weeks22017);
+
+		List<Week> weeks = weekService.getWeeksBySeason(weekId22017);
+		assertTrue(weeks.isEmpty());
+	}
+
+	@Test
+	public void getWeeksByLeagueWhichDoesNotExist() {
+		// find a league which doesn't exist or not created in DB and it should
+		// return empty list
+		String leagueId = UUID.randomUUID().toString();
+
+		LeagueView leagueView = new LeagueView();
+		leagueView.setId(leagueId);
+		leagueView.setSeasonId(UUID.randomUUID().toString());
+		leagueView.setLeagueName("Pickem 2016");
+		when(leagueIntServiceMock.getLeagueById(leagueId)).thenReturn(leagueView);
+
+		List<Week> weeks = weekService.getWeeksByLeague(leagueId);
+
+		assertTrue(weeks.isEmpty());
+	}
 
 	@Test
 	public void getWeeksByLeague()
