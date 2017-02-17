@@ -10,12 +10,7 @@ import org.springframework.context.annotation.Profile;
 public class CloudConfig extends AbstractCloudConfig {
 
 	@Bean
-    public String redisConnectionFactory() {
-       /* CloudFactory cloudFactory = new CloudFactory();
-        Cloud cloud = cloudFactory.getCloud();
-        RedisServiceInfo serviceInfo = (RedisServiceInfo) cloud.getServiceInfo("redis-myp");
-        String serviceID = serviceInfo.getId();
-        return cloud.getServiceConnector(serviceID, RedisConnectionFactory.class, null);*/
+	public String redisConnectionFactory() {
 		return "";
-    }
+	}
 }

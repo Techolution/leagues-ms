@@ -3,17 +3,14 @@ package com.makeurpicks.domain;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-@Entity
-public class Season {
+//@Entity
+public class Season_old {
 	@Id
 	private String id;
 
 	private int startYear;
 	private int endYear;
 	private String leagueType;
-
-	public Season() {
-	}
 
 	public String getId() {
 		return id;
@@ -63,7 +60,7 @@ public class Season {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Season other = (Season) obj;
+		Season_old other = (Season_old) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
