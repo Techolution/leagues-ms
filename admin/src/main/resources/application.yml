@@ -10,6 +10,7 @@ security:
     client:
       access-token-uri: ${vcap.services.auth-token.credentials.uri:http://localhost:9999/auth/oauth/token}
       user-authorization-uri: ${vcap.services.auth-authorize.credentials.uri:http://localhost:9999/auth/oauth/authorize}
+      logout-uri: http://localhost:9999/auth/logout
       client-id: confidential
       client-secret: secret
     resource:
