@@ -7,7 +7,7 @@ spring:
       username: ${vcap.mypick.config.server.username:admin}
       password: watchit
   profiles:
-    active: techopcf
+    active: dev
 encrypt:
   key: ${ENCRYPT_KEY:defaultkey} 
 #eureka:

@@ -45,8 +45,8 @@ RemoteSystemsTempFiles/
 .metadata/
 .recommenders/
 
-# Workspace
+# Workspace          #
 ######################
-.classpath
+.classpath/
 .project
-.settings
+.settings/
