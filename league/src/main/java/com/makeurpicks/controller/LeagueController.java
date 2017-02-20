@@ -117,5 +117,16 @@ public class LeagueController {
 		leagueService.deleteLeague(id);
 		return true;
 	}
+	
+	@RequestMapping(method = RequestMethod.DELETE, value = "/player/league/{leagueid}/{playerid}")
+	public @ResponseBody boolean deletePlayerFromLeague(@PathVariable String leagueid, @PathVariable String playerid) {
+		League league = leagueService.getLeagueById(leagueid);
+		if(league.getAdminId().equals(playerid)){
+			return false;
+		}else {
+			leagueService.removePlayerFromLeague(leagueid, playerid);
+			return true;
+		}
+	}
 
 }
