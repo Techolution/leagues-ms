@@ -106,6 +106,14 @@
 	});
 	
 	
+	app.directive('weeksFilter', function() {
+		return {
+			restrict: 'E',
+			templateUrl: 'partials/weeksFilter.html'
+		};
+	});
+	
+	
 	app.factory('leagueService', function ($http, $log) {
 	$log.debug('leagueService');
 		var service =  {
@@ -127,7 +135,6 @@
 	app.controller('ChromeController', function ($http, $scope,$window) {
 		$http.get('/admin/user').success(function(data) {
 			$scope.user = data.name;
-			$scope.authserverlogout = data.authserverlogout;
 		});
 		
 		$scope.logout = function () {
@@ -148,7 +155,7 @@
 		$scope.showseasons=true;
 		$scope.season={};
 		$scope.season.leagueType = "pickem";
-		$scope.season.leagueTypes="pickem";
+		$scope.season.leagueTypes=["pickem"];
 		$scope.season.startYear = 2017;
 		$scope.season.endYear = 2018;
 		
@@ -216,7 +223,7 @@
 	});
 	
 	//***************  LEAGUES  **************************
-	app.controller('CreateLeagueController', function ($scope, $http, $window, $log, leagueService) {
+	app.controller('CreateLeagueController', function ($scope, $http, $window,$location,$log, leagueService) {
 	
 		$scope.league = {};
 		$scope.season = {};
@@ -237,7 +244,7 @@
 		
 		$scope.season.startYear = 2016;
 		$scope.season.endYear = 2017;
-		$scope.season.leagueType = "pickem";
+		$scope.season.leagueType = ["pickem"];
 		
 		
 		this.addLeague = function() {
@@ -268,8 +275,31 @@
 			
 			$http.get('/admin/leagues/player/leagueid/'+leagueId).success(function(data) {
 				$scope.players = data;
+				$scope.playerLeagueId = leagueId;
 				
 			});
+		}
+		
+		$scope.removePlayerFromLeague= function(player){
+			$log.debug("CreateLeagueController:removePlayerFromLeague: playerLeagueId"+$scope.playerLeagueId+": player="+player);
+			$http({
+				method : "DELETE",
+				url : "/admin/leagues/player/league/"+$scope.playerLeagueId+"/"+player,
+				contentType : "application/json",
+				dataType : "json",
+			}).success(function(res) {
+				if(res == false){
+					alert("Cannot delete creater from league");
+				}else{
+					alert("Successfully removed Player from League");
+					$window.location.reload();
+				}
+			}).error(function(res) {
+				alert('fail');
+			});
+		
+	 
+			
 		}
 		
 	
@@ -350,6 +380,38 @@
 //			$scope.leagues = data;
 //			$scope.week.seasonId = data[0].seasonId;
 //		});
+		
+		
+		$scope.weeksBySeason = {};
+		$scope.weeksBySeason.leagueTypes = [];
+		$scope.weeksBySeason.filteredweeks = [];
+		
+		
+		$http.get('/admin/leagues/types').success(function(data) {
+			var arrayLength = data.length;
+			for (var i = 0; i < arrayLength; i++) {
+				$scope.weeksBySeason.leagueTypes.push(data[i]);
+			}
+		});
+		
+		$scope.$watch('weeksBySeason.leagueType', function (newValue, oldValue, scope) {
+		$http.get('/admin/leagues/seasons/leaguetypes/'+$scope.weeksBySeason.leagueType).success(function(data) {
+			$scope.weeksBySeason.allseasons = data;
+		});
+		});
+		
+		
+		$scope.$watch('weeksBySeason.seasonId', function (newValue, oldValue, scope) {
+//			console.log($scope.weeksBySeason.seasonId);
+			$scope.weeksBySeason.filteredweeks = [];
+			$http.get('/admin/weeks/seasonid/'+$scope.weeksBySeason.seasonId).success(function(data) {
+//				console.log(data);
+				var arrayLength = data.length;
+				for (var i = 0; i < arrayLength; i++) {
+					$scope.weeksBySeason.filteredweeks.push(data[i]);
+					}
+			});
+	  });
 		
 		$http.get('/admin/leagues/seasons/current').success(function(data) {
 			$scope.seasons = data;
