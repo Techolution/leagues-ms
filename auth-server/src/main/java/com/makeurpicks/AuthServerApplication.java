@@ -288,5 +288,5 @@ public class AuthServerApplication extends WebMvcConfigurerAdapter implements Co
 				"true").build());
 
 		clientService.createOAuthClientDetailsList(clientList);
-	}
+  }
 }

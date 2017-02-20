@@ -1,11 +1,12 @@
 //http://www.nfl.com/liveupdate/scorestrip/ss.xml
 (function () {
-	var app = angular.module('admin', ['ui.router']);
+	var app = angular.module('admin', ['ui.router','ngRoute']);
 	
-	app.config(function($stateProvider, $urlRouterProvider) {
+	app.config(function($stateProvider, $urlRouterProvider,$httpProvider) {
 		  //
 		  // For any unmatched url, redirect to /state1
 		  $urlRouterProvider.otherwise("/setup");
+		  $httpProvider.defaults.withCredentials = true;
 		  //
 		  // Now set up the states
 		  $stateProvider
@@ -123,19 +124,20 @@
 		return service;
 	});
 	
-	app.controller('ChromeController', function ($http, $scope) {
+	app.controller('ChromeController', function ($http, $scope,$window) {
 		$http.get('/admin/user').success(function(data) {
 			$scope.user = data.name;
+			$scope.authserverlogout = data.authserverlogout;
 		});
 		
 		$scope.logout = function () {
-//			   console.log("I am here"+JSON.stringify($location));
-			   $http.post('/admin/logout', {}).success(function() {
-				   				console.log("logout sucess...");
-			        }).error(function(data) {
-			          console.log("Logout failed");
-			          
-			        });
+
+	        $http.post($scope.authserverlogout, {withCredentials: true}).finally(function() {
+	            $http.post('logout', {}).finally(function() {
+	                window.location.reload(true);
+	                $location.path(".");
+	            });
+	        })
 			   
 			    }
 	});
