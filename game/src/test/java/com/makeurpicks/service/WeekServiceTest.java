@@ -14,7 +14,9 @@ import java.util.UUID;
 
 import org.jboss.util.id.GUID;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -27,6 +29,8 @@ import com.makeurpicks.GameApplication;
 import com.makeurpicks.domain.LeagueView;
 import com.makeurpicks.domain.Week;
 import com.makeurpicks.domain.WeekBuilder;
+import com.makeurpicks.exception.GameValidationException;
+import com.makeurpicks.exception.GameValidationException.GameExceptions;
 import com.makeurpicks.repository.WeekRepository;
 
 
@@ -43,6 +47,9 @@ public class WeekServiceTest {
 	@Autowired
 	@InjectMocks
 	private WeekService weekService;
+	
+	@Rule
+	public ExpectedException expectedEx = ExpectedException.none();
 	
 	
 	@Test
@@ -92,6 +99,37 @@ public class WeekServiceTest {
 		assertTrue(weeks.contains(weeka));
 		assertTrue(weeks.contains(weekb));
 	}
+	
+
+	@Test
+	public void testGetWeeksBySeasonWhichDoesNotExist() {
+
+		String weekId22017 = UUID.randomUUID().toString();
+		List<Week> weeks22017 = new ArrayList<>();
+
+		// find a week which doesn't exist and it should return empty list
+		when(weekRepository.findBySeasonId(weekId22017)).thenReturn(weeks22017);
+
+		List<Week> weeks = weekService.getWeeksBySeason(weekId22017);
+		assertTrue(weeks.isEmpty());
+	}
+
+	@Test
+	public void getWeeksByLeagueWhichDoesNotExist() {
+		// find a league which doesn't exist or not created in DB and it should
+		// return empty list
+		String leagueId = UUID.randomUUID().toString();
+
+		LeagueView leagueView = new LeagueView();
+		leagueView.setId(leagueId);
+		leagueView.setSeasonId(UUID.randomUUID().toString());
+		leagueView.setLeagueName("Pickem 2016");
+		when(leagueIntServiceMock.getLeagueById(leagueId)).thenReturn(leagueView);
+
+		List<Week> weeks = weekService.getWeeksByLeague(leagueId);
+
+		assertTrue(weeks.isEmpty());
+	}
 
 	@Test
 	public void getWeeksByLeague()
@@ -139,6 +177,21 @@ public class WeekServiceTest {
 		
 		assertTrue(weeks.contains(weeka));
 		assertTrue(weeks.contains(weekb));
+	}
+	
+	@Test
+	public void testcreateWeekWhichExist() {
+
+		expectedEx.expect(GameValidationException.class);
+		expectedEx.expectMessage(GameExceptions.WEEK_ALREADY_EXIST.toString());
+
+		String s2015 = UUID.randomUUID().toString();
+		Week week1 = createWeek(s2015, 1);
+		List<Week> weeks = new ArrayList<>();
+		weeks.add(week1);
+
+		when(weekRepository.findBySeasonId(s2015)).thenReturn(weeks);
+		weekService.createWeek(week1);
 	}
 
 	private Week createWeek(String seasonId, int weekNumber)

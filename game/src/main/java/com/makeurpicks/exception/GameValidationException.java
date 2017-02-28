@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class GameValidationException extends RuntimeException {
 
 	public enum GameExceptions {
-		GAME_IS_NULL, FAVORITE_IS_NULL, DOG_IS_NULL, WEEK_IS_NULL, GAMESTART_IS_NULL, TEAM_CANNOT_PLAY_ITSELF,
+		GAME_IS_NULL, FAVORITE_IS_NULL, DOG_IS_NULL, WEEK_IS_NULL, WEEK_ALREADY_EXIST, GAMESTART_IS_NULL, TEAM_CANNOT_PLAY_ITSELF,
 		TEAM_SHORT_TEAM_NOT_FOUND, SEASON_ID_IS_NULL, LEAGUE_SERVICE_DOWN
 	}
 	
