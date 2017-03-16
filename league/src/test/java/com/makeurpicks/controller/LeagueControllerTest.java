@@ -1,176 +1,132 @@
 package com.makeurpicks.controller;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.List;
+import java.security.Principal;
+import java.util.UUID;
 
+import org.apache.http.entity.ContentType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cloud.cloudfoundry.com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.gson.Gson;
 import com.makeurpicks.domain.League;
-import com.makeurpicks.domain.LeagueBuilder;
-import com.makeurpicks.service.LeagueService;
-import com.makeurpicks.test.rest.config.WithOAuth2Authentication;
+import com.makeurpicks.repository.LeagueRepository;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc
-@AutoConfigureTestDatabase
+@SpringBootTest
 public class LeagueControllerTest {
-	public static final MediaType APPLICATION_JSON_UTF8 = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype(), Charset.forName("utf8"));
-	// we need two one MVC with out OAuthAuthentication, other with
-	// OauthAuthentication
-	@Autowired
-	MockMvc mockMvc;
-	private MockMvc mvc;
-	@Autowired
-	private WebApplicationContext webapp;
 
-	@MockBean
-	private LeagueService leagueService;
+	@Autowired
+	private LeagueRepository leagueRepository;
 
-	private League league1;
-	private League league2;
-	private League league3;
+	@Autowired
+	private WebApplicationContext ctx;
+
+	private MockMvc mockMvc;
+
+	private Principal principal;
+
+	String testAdminUserName = "DUMMY_ADMIN_FOR_TEST";
+	String leagueNameOne = "League first for Integration test";
+	String leagueNameTwo = "League second for Integration test";
+	String seasonId = "b8928d9f-a1ff-4cf9-9cf9-27af8c3c685d";
+	String slash = "/";
+	String seasonPath = "/seasonid";
+
+	private static boolean setUpfinished = false;
 
 	@Before
-	public void setup() {
-		String player1Id = "1";
-		String player2Id = "2";
-		String player3Id = "3";
-		mvc = webAppContextSetup(webapp).build();
-		league1 = new LeagueBuilder().withAdminId(player1Id).withName("pickem").withPassword("football")
-				.withSeasonId("1").build();
+	public void init() {
+		mockMvc = MockMvcBuilders.webAppContextSetup(ctx).build();
 
-		league2 = new LeagueBuilder().withAdminId(player2Id).withName("suicide").withPassword("football")
-				.withSeasonId("1").build();
+		principal = new Principal() {
+			@Override
+			public String getName() {
+				return testAdminUserName;
+			}
+		};
 
-		league3 = new LeagueBuilder().withAdminId(player3Id).withName("superbowl").withPassword("football")
-				.withSeasonId("1").build();
-
-		List<League> allLeagues = new ArrayList<>();
-		allLeagues.add(league1);
-//		allLeagues.add(league2);
-//		allLeagues.add(league3);
-		given(this.leagueService.getAllLeagues()).willReturn(allLeagues);
-		given(this.leagueService.getLeagueById("1")).willReturn(league1);
+		if (setUpfinished) {
+			return;
+		} else {
+			setUpfinished = true;
+			// create dummy league to test
+			leagueRepository.save(createLeagueObject(leagueNameOne, principal.getName(), seasonId));
+		}
 	}
 
 	@Test
-	public void getAllleaguesWithoutAccessTokenShouldRespondUnauthorized() throws Exception {
-		this.mockMvc.perform(get("/").accept(MediaType.APPLICATION_JSON)).andExpect(status().isUnauthorized());
+	public void testGetAllLeague() throws Exception {
+		mockMvc.perform(get(slash).accept(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 	}
 
 	@Test
-	@WithOAuth2Authentication
-	public void getAllleaguesWithoutAuthenticationRespondStatusOk() throws Exception {
-		mvc.perform(get("/")).andExpect(status().isOk());
-		verify(this.leagueService).getAllLeagues();
-	}
-	
-	@Test
-	@WithOAuth2Authentication
-	public void getLeaguesByIdgivenId1returnLeague() throws Exception {
-		mvc.perform(get("/1")).andExpect(status().isOk()).andExpect(content().json("{'adminId':'1','leagueName':'pickem','password':'football','seasonId':'1'}"));
+	public void testGetLeagueById() throws Exception {
+
+		String jsonResponse = mockMvc.perform(get(slash).accept(MediaType.APPLICATION_JSON)).andReturn().getResponse()
+				.getContentAsString();
+
+		League[] leagues = new Gson().fromJson(jsonResponse, League[].class);
+
+		mockMvc.perform(get(slash + leagues[0].getId())).andExpect(status().isOk()).andDo(print())
+				.andExpect(jsonPath("$.id", equalTo(leagues[0].getId())))
+				.andExpect(jsonPath("$.leagueName", equalTo(leagues[0].getLeagueName())))
+				.andExpect(jsonPath("$.seasonId", equalTo(seasonId))).andReturn();
+
 	}
 
-	/*@Test
-	@WithOAuth2Authentication(username="admin")
-	public void createLeagueShouldCallCreateLeagueOnLeagueService() throws Exception {
-		 ObjectMapper mapper = new ObjectMapper();
-		    mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-		    ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-		    String requestJson=ow.writeValueAsString(league2 );
-		mvc.perform(post("/").contentType(APPLICATION_JSON_UTF8).content(requestJson));
-		verify(this.leagueService).createLeague(league2);
-	}*/
-	
-	// @RequestMapping(method=RequestMethod.POST, value="/")
-	// public @ResponseBody League createLeague(Principal user, @RequestBody
-	// League league) {
-	//
-	// if (league != null && league.getAdminId() == null)
-	// league.setAdminId(user.getName());
-	//
-	// return leagueService.createLeague(league);
-	//
-	// }
-	//
-	// @RequestMapping(method=RequestMethod.PUT, value="/")
-	// public @ResponseBody League updateLeague(@RequestBody League league)
-	// {
-	// return leagueService.updateLeague(league);
-	// }
-	//
-	//
-	// @RequestMapping(method=RequestMethod.GET, value="/player/{id}")
-	// public @ResponseBody Set<LeagueName> getLeaguesForPlayer(@PathVariable
-	// String id)
-	// {
-	// return leagueService.getLeaguesForPlayer(id);
-	// }
-	//
-	// @RequestMapping(method=RequestMethod.POST, value="/player")
-	// public void addPlayerToLeague(@RequestBody PlayerLeague playerLeague,
-	// Principal principal)
-	// {
-	// playerLeague.setPlayerId(principal.getName());
-	//
-	// log.debug("playerLeague ="+ playerLeague.toString());
-	//
-	// leagueService.joinLeague(playerLeague);
-	//
-	// }
-	//
-	// @RequestMapping(method=RequestMethod.POST, value="/player/admin")
-	// @PreAuthorize("hasRole('ADMIN')")
-	// public void addPlayerToLeague(@RequestBody PlayerLeague playerLeague)
-	// {
-	// log.debug("playerLeague ="+ playerLeague.toString());
-	//
-	// leagueService.joinLeague(playerLeague);
-	//
-	// }
-	//
-	// @RequestMapping(method=RequestMethod.GET, value="/name/{name}",produces =
-	// MediaType.APPLICATION_JSON)
-	// public @ResponseBody League getLeagueByName(@PathVariable String name)
-	// {
-	// return leagueService.getLeagueByName(name);
-	// }
-	//
-	// @RequestMapping(method=RequestMethod.DELETE, value="/player")
-	// public void removePlayerFromLeagye(@RequestBody PlayerLeague
-	// playerLeague)
-	// {
-	// leagueService.removePlayerFromLeagye(playerLeague.getLeagueId(),
-	// playerLeague.getPlayerId());
-	// }
-	//
-	// @RequestMapping(method=RequestMethod.GET,
-	// value="/player/leagueid/{leagueid}")
-	// public @ResponseBody Set<String> getPlayersInLeague(@PathVariable String
-	// leagueid)
+	@Test
+	public void testGetLeagueBySeasonId() throws Exception {
+		String jsonResponse = mockMvc.perform(get(slash).accept(MediaType.APPLICATION_JSON)).andReturn().getResponse()
+				.getContentAsString();
+
+		League[] leagues = new Gson().fromJson(jsonResponse, League[].class);
+
+		String servletPath = seasonPath + slash + leagues[0].getSeasonId();
+
+		mockMvc.perform(get(servletPath)).andExpect(status().isOk()).andDo(print())
+				.andExpect(jsonPath("$[0].id", equalTo(leagues[0].getId())))
+				.andExpect(jsonPath("$[0].leagueName", equalTo(leagues[0].getLeagueName())))
+				.andExpect(jsonPath("$[0].seasonId", equalTo(leagues[0].getSeasonId()))).andReturn();
+
+	}
+
+	@Test
+	public void testCreateLeague() throws Exception {
+		ObjectMapper mapper = new ObjectMapper();
+		String jsonString = mapper.writeValueAsString(createLeagueObject(leagueNameTwo, principal.getName(), seasonId));
+
+		mockMvc.perform(post(slash).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+				.accept(MediaType.APPLICATION_JSON).content(jsonString).principal(principal))
+				.andExpect(status().isOk());
+
+	}
+
+	private League createLeagueObject(String leagueName, String adminId, String seasonId) {
+		String leagueId = UUID.randomUUID().toString();
+		League league = new League();
+		league.setId(leagueId);
+		league.setLeagueName(leagueName);
+		league.setActive(true);
+		league.setSeasonId(seasonId);
+		league.setAdminId(adminId);
+		league.setPassword(leagueName);
+		return league;
+	}
+
 }
