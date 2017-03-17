@@ -1,8 +1,11 @@
 package com.makeurpicks.controller;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -10,7 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.security.Principal;
 import java.util.UUID;
 
-import org.apache.http.entity.ContentType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,6 +49,7 @@ public class LeagueControllerTest {
 	String seasonId = "b8928d9f-a1ff-4cf9-9cf9-27af8c3c685d";
 	String slash = "/";
 	String seasonPath = "/seasonid";
+	String playerPath = "/player";
 
 	private static boolean setUpfinished = false;
 
@@ -65,7 +68,7 @@ public class LeagueControllerTest {
 			return;
 		} else {
 			setUpfinished = true;
-			// create dummy league to test
+			// create dummy league to proceed for test
 			leagueRepository.save(createLeagueObject(leagueNameOne, principal.getName(), seasonId));
 		}
 	}
@@ -115,6 +118,68 @@ public class LeagueControllerTest {
 				.accept(MediaType.APPLICATION_JSON).content(jsonString).principal(principal))
 				.andExpect(status().isOk());
 
+	}
+
+	@Test
+	public void testUpdateLeague() throws Exception {
+
+		String updatedName = "New Updated via PUT";
+
+		String jsonResponse = mockMvc.perform(get(slash).accept(MediaType.APPLICATION_JSON)).andReturn().getResponse()
+				.getContentAsString();
+
+		League[] leagues = new Gson().fromJson(jsonResponse, League[].class);
+
+		League league = leagues[0];
+		String leagueIdToBeUpdated = league.getId();
+		league.setLeagueName(updatedName);
+
+		ObjectMapper mapper = new ObjectMapper();
+		String leagueJson = mapper.writeValueAsString(league);
+
+		mockMvc.perform(put(slash).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).accept(MediaType.APPLICATION_JSON)
+				.content(leagueJson).principal(principal)).andExpect(status().isOk());
+
+		String updatedJsonResponse = mockMvc.perform(get(slash).accept(MediaType.APPLICATION_JSON)).andReturn()
+				.getResponse().getContentAsString();
+
+		League[] updatedLeagues = new Gson().fromJson(updatedJsonResponse, League[].class);
+
+		boolean foundUpdatedDataInDb = false;
+		for (int i = 0; i < updatedLeagues.length; i++) {
+			if (updatedLeagues[i].getId().equals(leagueIdToBeUpdated)) {
+				foundUpdatedDataInDb = true;
+			}
+		}
+
+		assertTrue(foundUpdatedDataInDb);
+	}
+
+	@Test
+	public void testDeleteLeague() throws Exception {
+
+		String leagueJsonResponse = mockMvc.perform(get(slash).accept(MediaType.APPLICATION_JSON)).andReturn()
+				.getResponse().getContentAsString();
+
+		League[] leagues = new Gson().fromJson(leagueJsonResponse, League[].class);
+
+		String leagueIdToDelete = leagues[0].getId();
+
+		mockMvc.perform(delete(slash + leagueIdToDelete).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+				.accept(MediaType.APPLICATION_JSON).principal(principal)).andExpect(status().isOk());
+
+		String updatedLeagueJsonResponse = mockMvc.perform(get(slash).accept(MediaType.APPLICATION_JSON)).andReturn()
+				.getResponse().getContentAsString();
+
+		League[] updatedLeagues = new Gson().fromJson(updatedLeagueJsonResponse, League[].class);
+
+		boolean leagueDeleted = true;
+		for (int i = 0; i < updatedLeagues.length; i++) {
+			if (updatedLeagues[i].getId().equals(leagueIdToDelete)) {
+				leagueDeleted = false;
+			}
+		}
+		assertTrue(leagueDeleted);
 	}
 
 	private League createLeagueObject(String leagueName, String adminId, String seasonId) {
