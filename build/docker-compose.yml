@@ -39,6 +39,7 @@ services:
     depends_on:
       - auth-db
       - eureka
+
   config-server:
     build: ../server-config/
     networks:
@@ -47,7 +48,6 @@ services:
       - "8888:8888"
     expose:
       - "8888"
-
   admin:
     build: ../admin/
     networks:
@@ -130,8 +130,9 @@ services:
       - eureka
       - auth-server
       - config-server
+
   picks:
-    build: ../picks/
+    build: ../pick/
     networks:
       - myp-network
     ports:
