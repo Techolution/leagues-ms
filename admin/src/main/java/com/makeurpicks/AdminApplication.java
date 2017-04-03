@@ -13,17 +13,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.oauth2.client.OAuth2ClientContext;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.resource.BaseOAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -31,6 +34,9 @@ import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import org.springframework.security.web.header.HeaderWriterFilter;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.filter.RequestContextFilter;
 import org.springframework.web.util.WebUtils;
@@ -42,7 +48,6 @@ import org.springframework.web.util.WebUtils;
 //@Profile("testpcf")
 //@RibbonClient(name = "league", configuration = LeagueConfiguration.class)
 public class AdminApplication {
-
 	public static void main(String[] args) {
     	SpringApplication.run(AdminApplication.class, args);
     }
@@ -57,13 +62,24 @@ public class AdminApplication {
 	@Autowired
 	OAuth2ClientContext oAuth2ClientContext;
 	
-	@LoadBalanced
+	/*@LoadBalanced
 	@Bean
 	public OAuth2RestOperations securerestTemplate() {
 		return new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
-	}
+	}*/
+	
+	@Bean(value = "oauth2RestOperationsTemplate")
+	 @LoadBalanced
+	 public OAuth2RestOperations oauth2RestOperationsTemplate() {
+	  BaseOAuth2ProtectedResourceDetails baseOAuth2ProtectedResourceDetails = new BaseOAuth2ProtectedResourceDetails();
+	//  baseOAuth2ProtectedResourceDetails.setClientId("confidential");
+	  baseOAuth2ProtectedResourceDetails.setClientId("trusted");
+	  baseOAuth2ProtectedResourceDetails.setClientSecret("secret");
+	  baseOAuth2ProtectedResourceDetails.setGrantType("password");
+	  return new OAuth2RestTemplate(baseOAuth2ProtectedResourceDetails);
+	 }
 	 
-	/* @Bean
+	 @Bean
 		public FilterRegistrationBean corsFilter() {
 			UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 			CorsConfiguration config = new CorsConfiguration();
@@ -75,8 +91,48 @@ public class AdminApplication {
 			FilterRegistrationBean bean = new FilterRegistrationBean(new CorsFilter(source));
 			bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
 			return bean;
-		}*/
+		}
 	
+	/*@Component
+	@Order(Ordered.HIGHEST_PRECEDENCE)
+	public class SimpleCorsFilter implements Filter {
+
+	    public SimpleCorsFilter() {
+	    }
+
+	    @Override
+	    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+	        HttpServletResponse response = (HttpServletResponse) res;
+	        HttpServletRequest request = (HttpServletRequest) req;
+//	        String origin = ((RequestFacade) req).getHeader("origin");
+//	        response.setHeader("Access-Control-Allow-Origin", origin);
+	        response.setHeader("Access-Control-Allow-Origin", "http://localhost:9999");
+	         response.setHeader("Access-Control-Allow-Credentials","true");
+	        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+	        response.setHeader("Access-Control-Max-Age", "3600");
+	        response.setHeader("Access-Control-Allow-Headers", "X-Requested-With, Content-Type, Authorization");
+
+	        response.setStatus(HttpServletResponse.SC_OK);
+	        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+		        response.setStatus(HttpServletResponse.SC_OK);
+
+	        } else {
+	            chain.doFilter(req, res);
+	        }
+	    }
+
+		@Override
+		public void init(FilterConfig filterConfig) throws ServletException {
+			// TODO Auto-generated method stub
+			
+		}
+
+		@Override
+		public void destroy() {
+			// TODO Auto-generated method stub
+			
+		}
+	}*/
 	@Configuration
 	@EnableOAuth2Sso 
     protected static class SecurityConfiguration extends WebSecurityConfigurerAdapter {
@@ -86,11 +142,11 @@ public class AdminApplication {
             http
             	.logout().logoutSuccessUrl("/").and()
             	.authorizeRequests()
-                    .antMatchers("/login", "/beans", "/user", "/random","/seasons/**").permitAll()
+                    .antMatchers("/login", "/beans", "/user", "/random","/seasons/**","/admin/**").permitAll()
                     .anyRequest().hasRole("ADMIN").and()
 
                 .csrf()
-//                	.disable();
+//                	.disable()
                     .csrfTokenRepository(csrfTokenRepository()).and()
                     .addFilterBefore(new RequestContextFilter(), HeaderWriterFilter.class)
                     .addFilterAfter(csrfHeaderFilter(), CsrfFilter.class);

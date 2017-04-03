@@ -1,6 +1,4 @@
 spring:
-  application:
-   name: admin
   cloud:
     config:
       uri: ${vcap.services.config-service.uri:http://localhost:8888/config}

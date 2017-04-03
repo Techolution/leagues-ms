@@ -20,10 +20,10 @@ public class GameIntegrationService {
 
 	private Log log = LogFactory.getLog(GameIntegrationService.class);
 	
-	@Autowired
-    @Qualifier("loadBalancedRestTemplate")
-    @LoadBalanced
-    RestTemplate restTemplate;
+//	@Autowired
+//    @Qualifier("loadBalancedRestTemplate")
+//    @LoadBalanced
+//    RestTemplate restTemplate;
 
 	@Autowired
     @LoadBalanced

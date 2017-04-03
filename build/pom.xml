@@ -7,30 +7,32 @@
 	<packaging>pom</packaging>
 
 	<parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>1.4.2.RELEASE</version>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>1.4.5.RELEASE</version>
 	</parent>
-	
 	<dependencyManagement>
-	    <dependencies>
-	        <dependency>
-	            <groupId>org.springframework.cloud</groupId>
-	            <artifactId>spring-cloud-dependencies</artifactId>
-	            <version>Camden.RELEASE</version>
-	            <type>pom</type>
-	            <scope>import</scope>
-	        </dependency>
-	    </dependencies>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>Camden.SR6</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
 	</dependencyManagement>
 
 	<modules>
-<!-- 		<module>../game</module> -->
-<!-- 		<module>../league</module> -->
-<!-- 		<module>../pick</module> -->
-<!-- 		<module>../player</module> -->
-<!-- 		<module>../season</module> -->
-<!-- 		<module>../leader</module> -->
+		<module>../server-eureka</module>
+		<module>../server-config</module>
+		<module>../auth-server</module>
+		<module>../game</module> 
+		<module>../league</module> 
+	 	<module>../pick</module> 
+		<!-- <module>../player</module> -->
+		<!-- <module>../season</module> -->
+		<!-- <module>../leader</module> -->
 		<!-- <module>../league-starter</module> -->
 	</modules>
 
@@ -38,41 +40,40 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 	</properties>
-	
-	<repositories>
-		<repository>
-			<id>spring-snapshots</id>
-			<name>Spring Snapshots</name>
-			<url>https://repo.spring.io/snapshot</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>spring-milestones</id>
-			<name>Spring Milestones</name>
-			<url>https://repo.spring.io/milestone</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>spring-snapshots</id>
-			<name>Spring Snapshots</name>
-			<url>https://repo.spring.io/snapshot</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</pluginRepository>
-		<pluginRepository>
-			<id>spring-milestones</id>
-			<name>Spring Milestones</name>
-			<url>https://repo.spring.io/milestone</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.4.13</version>
+				<!-- <executions> -->
+				<!-- <execution> -->
+				<!-- <phase>package</phase> -->
+				<!-- <goals> -->
+				<!-- <goal>build</goal> -->
+				<!-- </goals> -->
+				<!-- </execution> -->
+				<!-- </executions> -->
+				<configuration>
+				    <skipDockerBuild>true</skipDockerBuild>
+					<dockerDirectory>${project.basedir}</dockerDirectory>
+					<serverId>nexus</serverId>
+					<!-- <registryUrl>http://nexus.techolution.com:8081/repository/TecholutionDockerRepo/</registryUrl> -->
+					<imageName>nexus.techolution.com:8123/myp/${project.artifactId}</imageName>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!-- <repositories> <repository> <id>spring-snapshots</id> <name>Spring 
+		Snapshots</name> <url>https://repo.spring.io/snapshot</url> <snapshots> <enabled>true</enabled> 
+		</snapshots> </repository> <repository> <id>spring-milestones</id> <name>Spring 
+		Milestones</name> <url>https://repo.spring.io/milestone</url> <snapshots> 
+		<enabled>false</enabled> </snapshots> </repository> </repositories> <pluginRepositories> 
+		<pluginRepository> <id>spring-snapshots</id> <name>Spring Snapshots</name> 
+		<url>https://repo.spring.io/snapshot</url> <snapshots> <enabled>true</enabled> 
+		</snapshots> </pluginRepository> <pluginRepository> <id>spring-milestones</id> 
+		<name>Spring Milestones</name> <url>https://repo.spring.io/milestone</url> 
+		<snapshots> <enabled>false</enabled> </snapshots> </pluginRepository> </pluginRepositories> -->
 </project>

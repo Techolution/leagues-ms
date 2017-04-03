@@ -111,6 +111,12 @@
 			<artifactId>jackson-datatype-jsr310</artifactId>
 		</dependency>
 
+		<dependency>
+		    <groupId>com.netflix.hystrix</groupId>
+		    <artifactId>hystrix-javanica</artifactId>
+		    <version>1.4.4</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

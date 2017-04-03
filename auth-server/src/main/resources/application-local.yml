@@ -1,0 +1,32 @@
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+  datasource:
+    url: jdbc:mysql://localhost:3303/player
+    username: dbuser
+    password: password
+    driver-class-name: com.mysql.jdbc.Driver
+
+
+config:
+   oauth2:
+        ui-uri: http://localhost:8080/
+        admin-uri: http://localhost:9000/admin/
+        admin-ssluri: https://localhost:9000/admin/
+        
+        
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    status-page-url: http://localhost:9999/auth/info
+    health-check-url: http://localhost:9999/auth/health
+    home-page-url: http://localhost:9999/auth     
+ 
+       

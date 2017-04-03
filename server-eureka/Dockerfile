@@ -1,4 +1,3 @@
-FROM java:8-alpine
-
+FROM davidcaste/alpine-java-unlimited-jce:jdk8
 ADD target/* /target/
-CMD ["java", "-jar", "/target/eureka-0.0.1.jar"]
+CMD ["java","-Dspring.profiles.active=container", "-jar", "/target/eureka-0.0.1.jar"]

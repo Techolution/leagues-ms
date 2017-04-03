@@ -1,0 +1,47 @@
+security:
+  oauth2:
+    client:
+      access-token-uri: http://auth:9999/auth/oauth/token
+      user-authorization-uri: http://auth:9999/auth/oauth/authorize
+#      access-token-uri: http://localhost:9999/auth/oauth/token
+#      user-authorization-uri: http://localhost:9999/auth/oauth/authorize
+      client-id: ui
+      client-secret: secret
+    resource:
+      jwt:
+        key-uri: http://auth:9999/auth/oauth/token_key
+        key-value: |
+            -----BEGIN PUBLIC KEY-----
+            MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDNQZKqTlO/+2b4ZdhqGJzGBDlt
+            b5PZmBz1ALN2YLvt341pH6i5mO1V9cX5Ty1LM70fKfnIoYUP4KCE33dPnC7LkUwE
+            /myh1zM6m8cbL5cYFPyP099thbVxzJkjHWqywvQih/qOOjliomKbM9pxG8Z1dB26
+            hL9dSAZuA8xExjlPmQIDAQAB
+            -----END PUBLIC KEY-----
+
+spring:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL5Dialect
+  datasource:
+    url: jdbc:mysql://${MYSQL_PORT_3306_TCP_ADDR:game-db}:${MYSQL_PORT_3306_TCP_PORT:3305}/${MYSQL_ENV_MYSQL_DATABASE:game}
+    username: ${MYSQL_USER:dbuser}
+    password: ${MYSQL_PASSWORD:password}
+    driver-class-name: com.mysql.jdbc.Driver 
+    dbcp:
+      max-active:  5
+      initial-size: 5
+      max-idle: 2
+      min-idle: 1
+      test-on-borrow: true
+      validation-query: SELECT 1
+      time-between-eviction-runs-millis: 3600000
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka:8761/eureka/
+  instance:
+    preferIpAddress: true

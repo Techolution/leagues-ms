@@ -1,11 +1,12 @@
 //http://www.nfl.com/liveupdate/scorestrip/ss.xml
 (function () {
-	var app = angular.module('admin', ['ui.router']);
+	var app = angular.module('admin', ['ui.router','ngRoute']);
 	
-	app.config(function($stateProvider, $urlRouterProvider) {
+	app.config(function($stateProvider, $urlRouterProvider,$httpProvider) {
 		  //
 		  // For any unmatched url, redirect to /state1
 		  $urlRouterProvider.otherwise("/setup");
+		  $httpProvider.defaults.withCredentials = true;
 		  //
 		  // Now set up the states
 		  $stateProvider
@@ -24,6 +25,10 @@
 		   .state('seasons', {
 		      url: "/seasons",
 		      templateUrl: "createSeasons.html"
+		    })
+		    .state('client', {
+		      url: "/client",
+		      templateUrl: "createClients.html"
 		    })
 		});
 	
@@ -48,12 +53,24 @@
 		};
 	});
 	
+	
+	
 	app.directive('createLeague', function() {
 		return {
 			restrict: 'E',
 			templateUrl: 'partials/createLeague.html'
 		};
 	});
+	
+
+	app.directive('filterSeason', function() {
+		return {
+			restrict: 'E',
+			templateUrl: 'partials/filterSeason.html'
+		};
+	});
+	
+	
 	
 	app.directive('createSeason', function() {
 		return {
@@ -104,6 +121,12 @@
 		};
 	});
 	
+	app.directive('listleaguesOnseason', function() {
+		return {
+			restrict: 'E',
+			templateUrl: 'partials/listleaguesOnseason.html'
+		};
+	});
 	
 	app.factory('leagueService', function ($http, $log) {
 	$log.debug('leagueService');
@@ -123,22 +146,26 @@
 		return service;
 	});
 	
-	app.controller('ChromeController', function ($http, $scope) {
+
+	app.controller('ChromeController', function ($http, $scope,$location) {
 		$http.get('/admin/user').success(function(data) {
 			$scope.user = data.name;
+			console.log($scope.user);
 		});
 		
 		$scope.logout = function () {
-//			   console.log("I am here"+JSON.stringify($location));
-			   $http.post('/admin/logout', {}).success(function() {
-				   				console.log("logout sucess...");
-			        }).error(function(data) {
-			          console.log("Logout failed");
-			          
-			        });
-			   
-			    }
+			console.log("I am here"+JSON.stringify($location));
+			$http.post('/admin/logout', {}).success(function() {
+			//$http.post('http://localhost:9999/auth/logout', {}).success(function() {
+				console.log("I am here success");
+		      }).error(function(data) {
+		        console.log("Logout failed");
+		        
+		      });
+			
+			}
 	});
+	
 	
 	//***************  Season  **************************
 	app.controller('CreateSeasonController', function ($scope, $http, $window, $log, leagueService) {
@@ -146,7 +173,7 @@
 		$scope.showseasons=true;
 		$scope.season={};
 		$scope.season.leagueType = "pickem";
-		$scope.season.leagueTypes="pickem";
+		$scope.season.leagueTypes=["pickem"];
 		$scope.season.startYear = 2017;
 		$scope.season.endYear = 2018;
 		
@@ -214,18 +241,49 @@
 	});
 	
 	//***************  LEAGUES  **************************
-	app.controller('CreateLeagueController', function ($scope, $http, $window, $log, leagueService) {
+	app.controller('CreateLeagueController', function ($scope, $http, $window,$location,$log, leagueService) {
 	
 		$scope.league = {};
 		$scope.season = {};
+		$scope.leaguesBySeason = {};
 		$scope.showgames=true;
 		$scope.hideplayers=false;
+		$scope.leaguesBySeason.leagueTypes = [];
+		
 		
 		leagueService.getLeagues().then(function(data) {
 			$scope.leagues = data;
 		});
 		
+		$http.get('/admin/leagues/types').success(function(data) {
+			var arrayLength = data.length;
+			for (var i = 0; i < arrayLength; i++) {
+				$scope.leaguesBySeason.leagueTypes.push(data[i]);
+			}
+		});
+		
+		$scope.$watch('leaguesBySeason.leagueType', function (newValue, oldValue, scope) {
+		$http.get('/admin/leagues/seasons/leaguetypes/'+$scope.leaguesBySeason.leagueType).success(function(data) {
+			$scope.allseasons = data;
+		});
+		});
+		
+		$scope.$watch('leaguesBySeason.seasonId', function (newValue, oldValue, scope) {
+			$http.get('/admin/leagues/seasonid/'+$scope.leaguesBySeason.seasonId).success(function(data) {
+				$scope.seasonalLeagues = data;
+			});
+			});
+		
+//		$scope.$watch('league.seasonId', function (newValue, oldValue, scope) {
+//			$http.get('/admin/leagues/seasons/'+$scope.league.seasonId).success(function(data) {
+//				$scope.leaguesBySeason.leagueTypes = [];
+//				$scope.leaguesBySeason.leagueTypes.push(data.leagueType);
+//			});
+//			
+//		});
+//		
 		$http.get('/admin/leagues/seasons/current').success(function(data) {
+//			console.log(JSON.stringify(data));
 			$scope.seasons = data;
 			if (data[0] === undefined)
 				$scope.showgames=false;
@@ -235,7 +293,14 @@
 		
 		$scope.season.startYear = 2016;
 		$scope.season.endYear = 2017;
-		$scope.season.leagueType = "pickem";
+		$scope.season.leagueType = ["pickem"];
+		
+		this.getReqLeagues = function(){
+			$http.get('/admin/leagues/seasonid/'+$scope.leaguesBySeason.seasonId).success(function(data) {
+//				console.log(data);
+				$scope.leagueValues = data;
+			});
+		}
 		
 		
 		this.addLeague = function() {
@@ -266,8 +331,31 @@
 			
 			$http.get('/admin/leagues/player/leagueid/'+leagueId).success(function(data) {
 				$scope.players = data;
+				$scope.playerLeagueId = leagueId;
 				
 			});
+		}
+		
+		$scope.removePlayerFromLeague= function(player){
+			$log.debug("CreateLeagueController:removePlayerFromLeague: playerLeagueId"+$scope.playerLeagueId+": player="+player);
+			$http({
+				method : "DELETE",
+				url : "/admin/leagues/player/league/"+$scope.playerLeagueId+"/"+player,
+				contentType : "application/json",
+				dataType : "json",
+			}).success(function(res) {
+				if(res == false){
+					alert("Cannot delete creater from league");
+				}else{
+					alert("Successfully removed Player from League");
+					$window.location.reload();
+				}
+			}).error(function(res) {
+				alert('fail');
+			});
+		
+	 
+			
 		}
 		
 	
@@ -641,7 +729,97 @@
 //		});
 	})
 	
+	/*************************CLIENT***************************/
 	
+app.controller('CreateClientController', function ($scope, $http, $window, $log, leagueService) {
+		
+		$scope.showclients=true;
+		$scope.client={};
+		$scope.clients={};
+		$scope.client.name = "";
+		$scope.client.authentication="";
+		$scope.client.authenticationid = "";
+		$scope.client.clientId = "";
+		$scope.client.client_secret = "";
+		$scope.client.authenticationid = "";
+		$scope.client.scope= "";
+		$scope.client.authorized_grant_types = "";
+		$scope.client.web_server_redirect_uri ="";
+		$scope.client.authorities = "";
+		$scope.client.refresh_token_validity=3600;
+		$scope.client.access_token_validity=3600;
+		$scope.client.autoapprove="true";
+		//$scope.season.endYear = 2018;
+		$scope.autoapprove = [
+		    { name: 'True',    selected: true },
+		    { name: 'False',   selected: false }
+		    
+		  ];
+		
+		$http.get('/admin/auth/players/getallclientdetails/').success(function(data) {
+			$scope.clients = data;
+		//	alert("Data is:"+$scope.client);
+			if (data[0] === undefined)
+				$scope.showclients=false;
+		});
+		
+	/*	$http.get('/admin/leagues/types').success(function(data) {
+			if (data[0] )
+				$scope.season.leagueTypes=data;
+		});*/
+		
+		/*this.deleteSeason = function(season) {
+			$log.debug("CreateSeasonController:deleteSeason: season.id="+season.id);
+			
+			if (confirm("Are yoou sure you want to delete season?")) {
+		    
+				var url = '/admin/leagues/seasons/'+season.id;
+				$http({
+					method : "DELETE",
+					url : url,
+					contentType : "application/json",
+					dataType : "json",
+				}).success(function(res) { 
+					
+					$http.get('/admin/leagues/seasons/current').success(function(data) {
+						$scope.seasons = data;
+						if (data[0] === undefined)
+							$scope.showseasons=false;
+					});
+					
+				}).error(function(res) {
+					alert('fail');
+				});
+			
+		 
+		    }
+		}
+		*/
+		this.addClient = function() {
+
+		
+			$log.debug("CreateClientController:createClient");
+			
+			$http({
+				method : "PUT",
+				url : '/admin/auth/players/',
+				contentType : "application/json",
+				dataType : "json",
+				data : JSON.stringify($scope.client)
+			}).success(function(res) { 
+				
+				$scope.showclients=true;
+				$http.get('/admin/auth/players/getallclientdetails').success(function(data) {
+					$scope.clients = data;
+				});
+				$window.location.href = '/admin/#/client';
+				
+			}).error(function(res) {
+				//alert('fail');
+			});
+			
+		}
+	});
 	
 	
 })();

@@ -16,21 +16,21 @@ public class LocalConfig {
 	
 
  
-    @Bean
-    public ComboPooledDataSource dataSource() throws PropertyVetoException {
-        ComboPooledDataSource dataSource = new ComboPooledDataSource();
-        
-        dataSource.setMaxPoolSize(10);
-        dataSource.setMinPoolSize(2);
-        dataSource.setAcquireIncrement(2);
-        dataSource.setIdleConnectionTestPeriod(3000);
-        dataSource.setMaxStatements(10);
-        dataSource.setMaxIdleTime(5000);
-        dataSource.setJdbcUrl("jdbc:mysql://localhost/game");
-        dataSource.setPassword("rage311");
-        dataSource.setUser("root");
-        dataSource.setDriverClass("org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider");
-        return dataSource;
-    }
+//    @Bean
+//    public ComboPooledDataSource dataSource() throws PropertyVetoException {
+//        ComboPooledDataSource dataSource = new ComboPooledDataSource();
+//        
+//        dataSource.setMaxPoolSize(10);
+//        dataSource.setMinPoolSize(2);
+//        dataSource.setAcquireIncrement(2);
+//        dataSource.setIdleConnectionTestPeriod(3000);
+//        dataSource.setMaxStatements(10);
+//        dataSource.setMaxIdleTime(5000);
+//        dataSource.setJdbcUrl("jdbc:mysql://localhost/game");
+//        dataSource.setPassword("rage311");
+//        dataSource.setUser("root");
+//        dataSource.setDriverClass("org.hibernate.service.jdbc.connections.internal.C3P0ConnectionProvider");
+//        return dataSource;
+//    }
 	
 }

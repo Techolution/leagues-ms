@@ -1,0 +1,88 @@
+version: "2"
+
+services:
+  config-server:
+    image: myp/config-server
+    networks:
+      - myp-network
+    ports:
+      - "8888:8888"
+    expose:
+      - "8888"
+  eureka:
+    image: myp/eureka
+    networks:
+      - myp-network
+    ports:
+      - "8761:8761"
+    expose:
+      - "8761"
+  auth:
+    image: myp/auth-server
+    networks:
+      - myp-network
+    ports:
+      - "9999:9999"
+    expose:
+      - "9999"
+    restart: always      
+    links:
+      - auth-db:auth-db
+    depends_on:
+      - auth-db
+      - eureka
+#  admin:
+#    build: ../admin/
+#    networks:
+#      - myp-network
+#    ports:
+#      - "9000:9000"
+#    expose:
+#      - "9000"
+#    links:
+#      - eureka:eureka
+#      - auth-server:auth-server
+#      - config-server:config-server
+#    depends_on:
+#      - eureka
+#      - auth-server
+#      - config-server
+#    restart: always
+#  league:
+#    build: ../league/
+#    networks:
+#      - myp-network
+#    ports:
+#      - "8081:8081"
+#    expose:
+#      - "8081"
+#    restart: always
+#    links:
+#      - eureka:eureka
+#      - auth-server:auth-server
+#      - config-server:config-server
+#      - league-db:league-db
+#    depends_on:
+#      - eureka
+#      - auth-server
+#      - config-server
+#      - league-db
+#  game:
+#    build: ../game/
+#    networks:
+#      - myp-network
+#    ports:
+#      - "8082:8082"
+#    expose:
+#      - "8082"
+#    restart: always
+#    links:
+#      - eureka:eureka
+#      - auth-server:auth-server
+#      - config-server:config-server
+#      - game-db:game-db
+#    depends_on:
+#      - eureka
+#      - auth-server
+#      - config-server
+#      - game-db

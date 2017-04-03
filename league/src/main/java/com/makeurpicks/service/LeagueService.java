@@ -117,6 +117,7 @@ public class LeagueService {
 		return leagueRepository.findByLeagueName(leagueName);
 	}
 
+
 	/*public League getLeagueByName(String name) {
 		Iterable<League> leagues = leagueRepository.findAll();
 		for (League league:leagues)
@@ -219,6 +220,8 @@ public class LeagueService {
 		
 		leagueRepository.delete(leagueId);
 	}
-	
+	public List<League> getLeagueBySeasonId(String seasonId) {
+		return leagueRepository.findBySeasonId(seasonId);
+	}
 	
 }

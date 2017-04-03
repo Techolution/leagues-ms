@@ -1,0 +1,23 @@
+
+<h2>Clients:</h2>
+<table class="table table-striped table-hover ">
+<thead>
+<tr>
+	
+	<th>id</th>
+	<th>secret</th>
+	
+	</tr>
+</thead>
+<tr id="client" ng-repeat="client in clients">
+
+<!-- <%if (games.gameStarted && (games.favScore !=0 || games.dogScore != 0)) {%>background-color: teal;<%}%> -->
+	<!-- <td><a href="#" ng-click="createSeasonCtrl.deleteSeason(season)">Delete</a></td> -->
+<!-- 	<td><a href="#" ng-click="showPlayers(league.id)">Players</a> </td> -->
+	<td>{{client.clientId}}</td> 
+	<td>{{client.client_secret}}</td>
+	<!-- <td>{{client.startYear}}</td>
+	<td>{{client.endYear}}</td> -->
+		
+</tr>
+</table>
