@@ -13,6 +13,7 @@
 		<groupId>com.makeurpicks</groupId>
 		<artifactId>build</artifactId>
 		<version>0.0.1</version>
+		<relativePath>../build</relativePath>
 	</parent>
 
 	<properties>
@@ -133,6 +134,19 @@
 			<artifactId>jboss-common-core</artifactId>
 			<version>2.2.10.GA</version>
 		</dependency>
+		
+		<dependency>
+		 <groupId>javax.validation</groupId>
+   		 <artifactId>validation-api</artifactId>
+    	 <version>1.1.0.Final</version>
+ 	   </dependency>
+ 	   
+ 	    <dependency>
+ 	    	<groupId>com.fasterxml</groupId>
+		    <artifactId>classmate</artifactId>
+    		<version>1.0.0</version>
+ 	    </dependency>
+ 	   
 	</dependencies>
 
 	
@@ -142,6 +156,14 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.4.13</version>
+				<configuration>
+				    <skipDockerBuild>false</skipDockerBuild>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

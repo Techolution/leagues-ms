@@ -32,6 +32,13 @@ public class SeasonController {
 		log.debug("Season Control ----- ");
 		return seasonService.getCurrentSeasons();
 	}
+	@RequestMapping(method=RequestMethod.GET, value="/leagueType/{leagueId}")
+	public @ResponseBody List<Season> getSeasonsByLeague(@PathVariable String leagueId)
+	{
+		return seasonService.getSeasonsByLeague(leagueId);
+	}
+	
+	
 	
 	
 	@RequestMapping(method=RequestMethod.POST, value="/")
@@ -53,6 +60,18 @@ public class SeasonController {
 	public @ResponseBody LeagueType[] getLeagueType()
 	{
 		return LeagueType.values();
+	}
+	
+	@RequestMapping(method=RequestMethod.GET, value="/leaguetypes/{leagueType}")
+	public @ResponseBody List<Season> getSeasonsByLeagueType(@PathVariable String leagueType)
+	{
+		return seasonService.getSeasonsByLeagueType(leagueType);
+	}
+	
+	@RequestMapping(method=RequestMethod.GET, value="/{id}")
+	public @ResponseBody Season getSeasonById(@PathVariable String id)
+	{
+		return seasonService.getSeasonById(id);
 	}
 	
 	@RequestMapping(method=RequestMethod.DELETE, value="/{id}")

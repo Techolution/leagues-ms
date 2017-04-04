@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import com.makeurpicks.domain.LeagueView;
 import com.makeurpicks.domain.Week;
+import com.makeurpicks.exception.GameValidationException;
+import com.makeurpicks.exception.GameValidationException.GameExceptions;
 import com.makeurpicks.repository.WeekRepository;
 
 @Component
@@ -41,11 +43,23 @@ public class WeekService {
 	
 	public Week createWeek(Week week)
 	{
-		
+		if (weekExistInSeason(week.getSeasonId(), week.getWeekNumber())) {
+			throw new GameValidationException(GameExceptions.WEEK_ALREADY_EXIST);
+		}
 		String id = UUID.randomUUID().toString();
-		
+
 		week.setId(id);
 		return weekRepository.save(week);
+	}
+	
+	private boolean weekExistInSeason(String seasonId, int weekNumber) {
+		boolean weekNumberExist = false;
+		List<Week> existingWeeks = weekRepository.findBySeasonId(seasonId);
+		for (Week existingWeek : existingWeeks) {
+			if (existingWeek.getWeekNumber() == weekNumber)
+				weekNumberExist = true;
+		}
+		return weekNumberExist;
 	}
 	
 }

@@ -1,6 +1,7 @@
 package com.makeurpicks.controller;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Set;
 
 
@@ -54,7 +55,12 @@ public class LeagueController {
 	public @ResponseBody League getLeagueById(@PathVariable String id) {
 		return leagueService.getLeagueById(id);
 	}
-
+	
+	@RequestMapping(method = RequestMethod.GET, value = "/seasonid/{id}")
+	public @ResponseBody List<League> getLeagueBySeasonId(@PathVariable String id) {
+		return leagueService.getLeagueBySeasonId(id);
+	}
+  
 	@RequestMapping(method = RequestMethod.POST, value = "/")
 	public @ResponseBody League createLeague(Principal user,
 			@RequestBody League league) {
@@ -117,6 +123,17 @@ public class LeagueController {
 	public @ResponseBody boolean deleteLeague(@PathVariable String id) {
 		leagueService.deleteLeague(id);
 		return true;
+	}
+	
+	@RequestMapping(method = RequestMethod.DELETE, value = "/player/league/{leagueid}/{playerid}")
+	public @ResponseBody boolean deletePlayerFromLeague(@PathVariable String leagueid, @PathVariable String playerid) {
+		League league = leagueService.getLeagueById(leagueid);
+		if(league.getAdminId().equals(playerid)){
+			return false;
+		}else {
+			leagueService.removePlayerFromLeague(leagueid, playerid);
+			return true;
+		}
 	}
 
 }
