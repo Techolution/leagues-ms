@@ -14,7 +14,6 @@ import com.makeurpicks.domain.PlayerLeague;
 import com.makeurpicks.domain.PlayerLeagueId;
 import com.makeurpicks.exception.LeagueValidationException;
 import com.makeurpicks.exception.LeagueValidationException.LeagueExceptions;
-import com.makeurpicks.message.channels.LeagueWriter;
 import com.makeurpicks.repository.LeagueRepository;
 import com.makeurpicks.repository.PlayerLeagueRepository;
 import com.makeurpicks.utils.HelperUtils;
@@ -24,21 +23,18 @@ public class LeagueService {
 
 	private LeagueRepository leagueRepository;
 	private PlayerLeagueRepository playerLeagueRepository;
-	private  LeagueWriter writer;
 	@Autowired
-	public LeagueService(LeagueRepository leagueRepository,PlayerLeagueRepository playerLeagueRepository,LeagueWriter writer) {
+	public LeagueService(LeagueRepository leagueRepository,PlayerLeagueRepository playerLeagueRepository) {
 		this.leagueRepository=leagueRepository;
 		this.playerLeagueRepository=playerLeagueRepository;
-		this.writer=writer;
 		
 	}
 	public League createLeague(League league) throws LeagueValidationException {
 		validateLeague(league);
 		String id = UUID.randomUUID().toString();
 		league.setId(id);
-//		leagueRepository.save(league);
-		writer.write(league);
-//		addPlayerToLeague(league, league.getAdminId());
+		leagueRepository.save(league);
+		addPlayerToLeague(league, league.getAdminId());
 		return league;
 	}
 

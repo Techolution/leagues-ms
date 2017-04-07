@@ -10,10 +10,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.makeurpicks.domain.League;
 import com.makeurpicks.domain.LeagueType;
 import com.makeurpicks.domain.Season;
-import com.makeurpicks.message.channels.SeasonWriter;
 import com.makeurpicks.exception.LeagueValidationException;
 import com.makeurpicks.exception.LeagueValidationException.LeagueExceptions;
 import com.makeurpicks.repository.SeasonRepository;
@@ -23,11 +21,9 @@ public class SeasonService {
 	
 	private SeasonRepository seasonRepository;
 
-	private  SeasonWriter writer;
 	@Autowired
-	public SeasonService(SeasonRepository seasonRepository,SeasonWriter seasonWriter) {
+	public SeasonService(SeasonRepository seasonRepository) {
 		this.seasonRepository=seasonRepository;
-		this.writer= seasonWriter;
 		
 	}
 	
@@ -69,9 +65,9 @@ public class SeasonService {
 		season.setId(id);
 //		this.channel.send(MessageBuilder.withPayload(season).build());
 		System.out.println(season.getClass().getSimpleName()); 
-		writer.write(season);
-//		return seasonRepository.save(season);
-		return season;
+//		writer.write(season);
+		return seasonRepository.save(season);
+	//	return season;
 	}
 	
 	public Season updateSeason(Season season)
