@@ -13,9 +13,9 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
   datasource:
-    url: jdbc:mysql://game-db:3305/game
-    username: dbuser
-    password: password
+    url: jdbc:mysql://${MYSQL_PORT_3306_TCP_ADDR:game-db}/${MYSQL_ENV_MYSQL_DATABASE:game}
+    username: ${MYSQL_USER:dbuser}
+    password: ${MYSQL_PASSWORD:password}
     driver-class-name: com.mysql.jdbc.Driver 
     dbcp:
       max-active:  5
@@ -30,7 +30,7 @@ security:
   oauth2:
     resource:
       jwt:
-        key-uri: http://auth.delesio.com:9999/auth/oauth/token_key
+        key-uri: http://myp.techolution.com/auth/oauth/token_key
   basic:
     enabled: false
   user:
@@ -41,7 +41,7 @@ eureka:
     service-url:
       defaultZone: http://eureka:8761/eureka/
   instance:
-#    preferIpAddress: true
+    preferIpAddress: true
     status-page-url: http://delesio.com:${server.port}/info
     health-check-url: http://delesio.com:${server.port}/health
     home-page-url: http://delesio.com:${server.port}/

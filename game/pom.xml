@@ -154,7 +154,24 @@
  	    	<groupId>com.fasterxml</groupId>
 		    <artifactId>classmate</artifactId>
     		<version>1.0.0</version>
+<<<<<<< Updated upstream
  	    </dependency> -->
+
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-undertow</artifactId>
+		</dependency>
  	   
 	</dependencies>
 

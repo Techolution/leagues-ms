@@ -1,0 +1,143 @@
+version: "2"
+
+services:
+  config-server:
+    image: serverconfig
+    networks:
+      - myp-network
+    ports:
+      - "8888:8888"
+    expose:
+      - "8888"
+    links:
+      - eureka:eureka
+  eureka:
+    image: servereureka
+    networks:
+      - myp-network
+    ports:
+      - "8761:8761"
+    expose:
+      - "8761"
+  auth:
+    image: authserver
+    networks:
+      - myp-network
+    ports:
+      - "9999:9999"
+    expose:
+      - "9999"
+#    restart: always
+    links:
+      - auth-db:auth-db
+      - config-server:config-server
+      - eureka:eureka
+    depends_on:
+      - auth-db
+      - eureka
+      - config-server
+    environment:
+      - MYSQL_PORT_3306_TCP_ADDR=auth-db
+      - MYSQL_PORT_3306_TCP_PORT=3303
+      - MYSQL_ENV_MYSQL_DATABASE=player
+      - MYSQL_USER=dbuser
+      - MYSQL_PASSWORD=password
+    restart: on-failure:3
+  league:
+    image: leagueserver
+    networks:
+      - myp-network
+    ports:
+      - "8081:8081"
+    expose:
+      - "8081"
+    restart: on-failure:3
+    links:
+      - eureka:eureka
+      - auth:auth
+      - config-server:config-server
+      - league-db:league-db
+    depends_on:
+      - eureka
+      - auth
+      - config-server
+      - league-db
+  game:
+    image: gameserver
+    networks:
+      - myp-network
+    ports:
+      - "8082:8082"
+    expose:
+      - "8082"
+    restart: on-failure:3
+    links:
+      - eureka:eureka
+      - auth:auth
+      - config-server:config-server
+      - game-db:game-db
+    depends_on:
+      - eureka
+      - auth
+      - config-server
+      - game-db
+#  pick:
+#    image: pickserver
+#    networks:
+#      - myp-network
+#    ports:
+#      - "8083:8083"
+#    expose:
+#      - "8083"
+#    restart: on-failure:3
+#    links:
+#      - eureka:eureka
+#      - auth:auth
+#      - config-server:config-server
+#      - pick-db:pick-db
+#      - redis:redis
+#    depends_on:
+#      - eureka
+#      - auth
+#      - config-server
+#      - pick-db
+#      - redis
+  admin:
+    image: adminserver
+    networks:
+      - myp-network
+    ports:
+      - "9000:9000"
+    expose:
+      - "9000"
+    links:
+      - eureka:eureka
+      - auth:auth
+      - config-server:config-server
+    depends_on:
+      - eureka
+      - auth
+      - config-server
+      - league
+      - game
+    restart: on-failure:3
+
+  gateway:
+    image: gatewayserver
+    networks:
+      - myp-network
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
+    links:
+      - eureka:eureka
+      - auth:auth
+      - config-server:config-server
+    depends_on:
+      - eureka
+      - auth
+      - config-server
+      - league
+      - game
+    restart: on-failure:3

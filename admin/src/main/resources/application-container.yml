@@ -1,9 +1,11 @@
 security:
   oauth2:
     client:
-      access-token-uri: http://auth.delesio.com:9999/auth/oauth/token
-      user-authorization-uri: http://auth.delesio.com:9999/auth/oauth/authorize
-      logout-uri: http://auth.delesio.com:9999/auth/logout
+      useCurrentUri: false
+      preEstablishedRedirectUri: http://myp.techolution.com/admin/login
+      access-token-uri: http://myp.techolution.com/auth/oauth/token
+      user-authorization-uri: http://myp.techolution.com/auth/oauth/authorize
+      logout-uri: http://myp.techolution.com/auth/logout
       client-id: confidential
       client-secret: secret
     resource:
@@ -27,7 +29,7 @@ eureka:
     service-url:
       defaultZone: http://eureka:8761/eureka/
   instance:
-#    preferIpAddress: true
-    status-page-url: http://delesio.com:900/admin/info
+    preferIpAddress: true
+    status-page-url: http://delesio.com:9000/admin/info
     health-check-url: http://delesio.com:9000/admin/health
     home-page-url: http://delesio.com:9000/admin   

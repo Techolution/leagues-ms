@@ -1,8 +1,10 @@
 security:
   oauth2:
     client:
-      access-token-uri: http://auth.delesio.com:9999/auth/oauth/token
-      user-authorization-uri: http://auth.delesio.com:9999/auth/oauth/authorize
+      useCurrentUri: false
+      preEstablishedRedirectUri: http://myp.techolution.com/login
+      access-token-uri: http://myp.techolution.com/auth/oauth/token
+      user-authorization-uri: http://myp.techolution.com/auth/oauth/authorize
       client-id: ui
       client-secret: secret
     resource:
@@ -20,7 +22,7 @@ eureka:
     service-url:
       defaultZone: http://eureka:8761/eureka/
   instance:
-#    preferIpAddress: true
+    preferIpAddress: true
     status-page-url: http://delesio.com:8080/info
     health-check-url: http://delesio.com:8080/health
     home-page-url: http://delesio.com:8080/

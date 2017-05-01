@@ -7,17 +7,17 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
   datasource:
-    url: jdbc:mysql://auth-db:3306/player
-    username: dbuser
-    password: password
-    driver-class-name: com.mysql.jdbc.Driver   
+    url: jdbc:mysql://${MYSQL_PORT_3306_TCP_ADDR:auth-db}/${MYSQL_ENV_MYSQL_DATABASE:player}?autoReconnect=true&useSSL=false
+    username: ${MYSQL_USER:dbuser}
+    password: ${MYSQL_PASSWORD:password}
+    driver-class-name: com.mysql.jdbc.Driver
 
 
 config:
    oauth2:
-        ui-uri: http://admin:8080/
-        admin-uri: http://admin:9000/admin/
-        admin-ssluri: https://admin:9000/admin/
+        ui-uri: http://myp.techolution.com/
+        admin-uri: http://myp.techolution.com/admin/
+        admin-ssluri: http://myp.techolution.com/admin/
 
 
 eureka:
@@ -25,9 +25,9 @@ eureka:
     service-url:
       defaultZone: http://eureka:8761/eureka/
   instance:
-#    preferIpAddress: true
+    preferIpAddress: true
     status-page-url: http://delesio.com:9999/auth/info
     health-check-url: http://delesio.com:9999/auth/health
-    home-page-url: http://delesio.com:9999/auth     
+    home-page-url: http://delesio.com:9999/auth
  
          
