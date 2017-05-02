@@ -47,23 +47,6 @@ public class PicksApplication {
         SpringApplication.run(PicksApplication.class, args);
     }
 
-    @LoadBalanced
-    @Bean(name = {"loadBalancedRestTemplate"})
-    RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-
-    @Autowired
-    AuthorizationCodeResourceDetails oAuth2ProtectedResourceDetails;
-    @Autowired
-    OAuth2ClientContext oAuth2ClientContext;
-
-    @LoadBalanced
-    @Bean
-    public OAuth2RestOperations securerestTemplate() {
-        return new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
-    }
-    
     @Configuration
     @EnableWebSecurity
     @EnableGlobalMethodSecurity(prePostEnabled = true)

@@ -645,7 +645,7 @@
 				$scope.edit_game_model.favScore = data.favScore;
 				$scope.edit_game_model.dogScore = data.dogScore;
 				$scope.edit_game_model.id = data.id;
-//				$scope.edit_game_model.weekId = data.weekId;
+				$scope.edit_game_model.weekId = data.weekId;
 //				$scope.edit_game_model.seasonId = data.seasonId;
 				
 				
