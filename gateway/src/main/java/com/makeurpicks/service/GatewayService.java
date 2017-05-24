@@ -12,7 +12,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.makeurpicks.controller.GatewayController;
 import com.makeurpicks.domain.PlayerWins;
 import com.makeurpicks.domain.ViewPickColumn;
 import com.makeurpicks.service.game.GameIntegrationService;
@@ -29,168 +28,175 @@ import rx.Observable;
 @Service
 public class GatewayService {
 
-
 	private Log log = LogFactory.getLog(GatewayService.class);
-	
+
 	@Autowired
 	private LeagueIntegrationService leagueIntegrationService;
-	
+
 	@Autowired
 	private PickIntegrationService pickIntegrationService;
-	
+
 	@Autowired
 	private GameIntegrationService gameIntegrationService;
-	
+
 	@Autowired
 	private TeamIntegrationService teamIntegrationService;
-	
-	
-	private String matrixKey(String playerId, String gameId)
-	{
+
+	private String matrixKey(String playerId, String gameId) {
 		return new StringBuilder(playerId).append("+").append(gameId).toString();
 	}
-	
-	public Observable<List<List<ViewPickColumn>>> getPlayersPlusWinsInLeague(String leagueId, String weekId)
-	{
+
+	public Observable<List<List<ViewPickColumn>>> getPlayersPlusWinsInLeague(String leagueId, String weekId, String loggedInUser) {
 
 		List<List<ViewPickColumn>> row = new ArrayList<>();
-		
-		return Observable.zip(
-				leagueIntegrationService.getPlayersForLeague(leagueId),
+
+		return Observable.zip(leagueIntegrationService.getPlayersForLeague(leagueId),
 				pickIntegrationService.getPicksForAllPlayerForWeek(leagueId, weekId),
 				pickIntegrationService.getAllDoublePickForPlayerForWeek(leagueId, weekId),
-				gameIntegrationService.getGamesForWeek(weekId),
-				teamIntegrationService.getTeams(),
+				gameIntegrationService.getGamesForWeek(weekId), teamIntegrationService.getTeams(),
 				(players, picks, doublePicks, games, teams) -> {
-					
-					log.debug("getPlayersPlusWinsInLeague:zip");				
-					log.debug("players="+players);
-					log.debug("picks="+picks);
-					log.debug("doublePicks="+doublePicks);
-					log.debug("games="+games);
-					log.debug("teams="+teams);
-					
+
+					log.debug("getPlayersPlusWinsInLeague:zip");
+					log.debug("players=" + players);
+					log.debug("picks=" + picks);
+					log.debug("doublePicks=" + doublePicks);
+					log.debug("games=" + games);
+					log.debug("teams=" + teams);
+
 					Map<String, PlayerWins> winsByPlayer = new HashMap<>();
-					 
+
 					ViewPickColumn pickColumn;
 					Map<String, ViewPickColumn> pickMatrix = new HashMap<>();
-					
-					for (PlayerView player : players)
-					{
+
+					for (PlayerView player : players) {
 						Map<String, PickView> picksForAllPlayers = picks.get(player.getId());
-//						columns = new ArrayList<>(players.size());
-						
-						//init player wins to handle non-pickers
+						// columns = new ArrayList<>(players.size());
+
+						// init player wins to handle non-pickers
 						int wins = 0;
-						
-						for (GameView game : games)
-						{
-                            pickColumn = ViewPickColumn.asNoPick(game.getId(), player.getId());
-							/*if (!game.getHasGameStarted())
-							{
-								pickColumn = ViewPickColumn.asNotStarted(game.getId(), player.getId());
-								continue;
-							}*/
-							
-							//figure out gamewinner
+						int no_pick = 0;
+
+						for (GameView game : games) {
+							pickColumn = ViewPickColumn.asNoPick(game.getId(), player.getId());
+							/*
+							 * if (!game.getHasGameStarted()) { pickColumn =
+							 * ViewPickColumn.asNotStarted(game.getId(),
+							 * player.getId()); continue; }
+							 */
+
+							// figure out gamewinner
 							String gameWinner = game.getGameWinner();
-                            if (picksForAllPlayers != null) {
-                                PickView pick = picksForAllPlayers.get(game.getId());
-                                if (pick != null) {
-                                    DoublePickView dpv = null;
-                                    if (doublePicks != null) {
-                                        dpv = doublePicks.get(player.getId());
-                                    }
-                                    boolean isDouble = false;
-                                    if (dpv != null && dpv.getGameId().equals(game.getId()))
-                                        isDouble = true;
+							
+							if (picksForAllPlayers != null) {
+								PickView pick = picksForAllPlayers.get(game.getId());
+								if (pick != null) {
+									DoublePickView dpv = null;
+									
+									if (doublePicks != null) {
+										dpv = doublePicks.get(player.getId());
+									}
+									
+									boolean isDouble = false;
+									if (dpv != null && dpv.getGameId().equals(game.getId())){
+										isDouble = true;
+										no_pick +=2;
+									}else{
+										no_pick +=1;
+									}
 
-                                    if (gameWinner.equals(pick.getTeamId())) {
-                                        PlayerWins playerWins = winsByPlayer.get(player.getId());
-                                        if (playerWins == null)
-                                            wins = 0;
-                                        else
-                                            wins = playerWins.getWins();
+									if (gameWinner.equals(pick.getTeamId())) {
+										PlayerWins playerWins = winsByPlayer.get(player.getId());
+										if (playerWins == null)
+											wins = 0;
+										else
+											wins = playerWins.getWins();
 
-                                        if (isDouble) {
-                                            wins = new Integer(wins += 2);
-                                            pickColumn = ViewPickColumn.asDoubleWinner(game.getId(), player.getId(), teams.get(pick.getTeamId()).getShortName());
-                                        } else {
-                                            wins = new Integer(wins += 1);
-                                            pickColumn = ViewPickColumn.asWinner(game.getId(), player.getId(), teams.get(pick.getTeamId()).getShortName());
-                                        }
+										if (isDouble) {
+											wins = new Integer(wins += 2);
+											pickColumn = ViewPickColumn.asDoubleWinner(game.getId(), player.getId(),
+													teams.get(pick.getTeamId()).getShortName());
+										} else {
+											wins = new Integer(wins += 1);
+											pickColumn = ViewPickColumn.asWinner(game.getId(), player.getId(),
+													teams.get(pick.getTeamId()).getShortName());
+										}
 
-//									winsByPlayer.add(PlayerWins.build(player.getId(), wins));
+										// winsByPlayer.add(PlayerWins.build(player.getId(), wins));
 
-                                    } else {
-                                        //game loser
-                                        if (isDouble)
-                                            pickColumn = ViewPickColumn.asDoubleLoser(game.getId(), player.getId(), teams.get(pick.getTeamId()).getShortName());
-                                        else
-                                            pickColumn = ViewPickColumn.asLoser(game.getId(), player.getId(), teams.get(pick.getTeamId()).getShortName());
-                                    }
-                                }
-                            }
-							else
-							{
-								//no pick
+									} else {
+										// game loser
+										if (isDouble)
+											pickColumn = ViewPickColumn.asDoubleLoser(game.getId(), player.getId(),
+													teams.get(pick.getTeamId()).getShortName());
+										else
+											pickColumn = ViewPickColumn.asLoser(game.getId(), player.getId(),
+													teams.get(pick.getTeamId()).getShortName());
+									}
+								}
+							} else {
+								// no pick
 								pickColumn = ViewPickColumn.asNoPick(game.getId(), player.getId());
 							}
-							
-							
-							winsByPlayer.put(player.getId(), PlayerWins.build(player.getId(), wins));
+
+							winsByPlayer.put(player.getId(), PlayerWins.build(player.getId(), wins, no_pick));
 							pickMatrix.put(matrixKey(player.getId(), game.getId()), pickColumn);
-						}						
+						}
 					}
-					
+
 					Collection<PlayerWins> pw = winsByPlayer.values();
 					List<PlayerWins> sortedPlayers = new ArrayList<>(pw);
-					Collections.sort(sortedPlayers, (w1, w2) -> new Integer(w2.getWins()).compareTo(new Integer(w1.getWins())));
 					
-					
-					
-					
+					Collections.sort(sortedPlayers,
+							(w1, w2) -> new Integer(w2.getPicks()).compareTo(new Integer(w1.getPicks())));
+					Collections.sort(sortedPlayers,
+							(w1, w2) -> new Integer(w2.getWins()).compareTo(new Integer(w1.getWins())));
+
 					PlayerWins player;
 					GameView game;
 					List<ViewPickColumn> columns = new ArrayList<>(players.size());
-					for (int j=0; j<sortedPlayers.size();j++)
-					{
+					for (int j = 0; j < sortedPlayers.size(); j++) {
 						player = sortedPlayers.get(j);
-						if (j == 0)
-						{
-							//0,0 should have a blank space
+						if (j == 0) {
+							// 0,0 should have a blank space
 							columns.add(ViewPickColumn.asBlank());
 						}
-						
-						columns.add(ViewPickColumn.asColumnHeader(player.getPlayerId(), player.getWins()));
+
+						if(loggedInUser.equalsIgnoreCase(player.getPlayerId())){
+							/*
+							 * If the player is the logged in user, he must be in the first column...
+							 */
+							columns.add(1, ViewPickColumn.asColumnHeader(player.getPlayerId(), player.getWins()));
+						}else{
+							columns.add(ViewPickColumn.asColumnHeader(player.getPlayerId(), player.getWins()));
+						}
 					}
 					row.add(columns);
-					
-					
-					for (int i=0; i<games.size();i++)
-					{
+
+					for (int i = 0; i < games.size(); i++) {
 						game = games.get(i);
-						
+
 						columns = new ArrayList<>(players.size());
-						for (int j=0; j<sortedPlayers.size();j++)
-						{
+						for (int j = 0; j < sortedPlayers.size(); j++) {
 							player = sortedPlayers.get(j);
-							
-							if (j==0)
-							{
+
+							if (j == 0) {
 								columns.add(ViewPickColumn.asRowHeader(game.getFavShortName(), game.getDogShortName()));
-			
+
 							}
-							
-							columns.add(pickMatrix.get(matrixKey(player.getPlayerId(), game.getId())));	
-							
+
+							if(loggedInUser.equalsIgnoreCase(player.getPlayerId())){
+								columns.add(1, pickMatrix.get(matrixKey(player.getPlayerId(), game.getId())));
+							}else{
+								columns.add(pickMatrix.get(matrixKey(player.getPlayerId(), game.getId())));
+							}
+
 						}
-						
+
 						row.add(columns);
 					}
-					
+
 					return row;
 				});
-		
+
 	}
 }

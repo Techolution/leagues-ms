@@ -160,13 +160,22 @@ MAKE PICKS
 
 .viewpicks  {
 	height:30px; 
-	padding:0; 
+	padding:0px; 
 	line-height:28px; 
 	color:#FFFFFF;
+	margin-left: 5px;
 }
 
 .viewpicks .l {
 	color:#ff0000;
+	margin-left: 10px;
+}
+
+.viewpicks td:nth-child(2) {
+	/* background-image: url(../img/colors/medium-dk.png); */
+	padding-right: 5px;
+	padding-left: 5px;
+	font-weight: bolder;
 }
 
 .viewpicks .w {

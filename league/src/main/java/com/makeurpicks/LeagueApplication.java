@@ -1,19 +1,13 @@
 package com.makeurpicks;
 
-import java.util.Calendar;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.stream.annotation.EnableBinding;
-import org.springframework.cloud.stream.binder.PartitionKeyExtractorStrategy;
-import org.springframework.cloud.stream.binder.PartitionSelectorStrategy;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.integration.annotation.IntegrationComponentScan;
-import org.springframework.messaging.Message;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,7 +16,6 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import com.makeurpicks.domain.League;
 import com.makeurpicks.domain.LeagueBuilder;
 import com.makeurpicks.domain.LeagueType;
-import com.makeurpicks.domain.PlayerLeague;
 import com.makeurpicks.domain.Season;
 import com.makeurpicks.domain.SeasonBuilder;
 import com.makeurpicks.message.channels.SqlChannels;

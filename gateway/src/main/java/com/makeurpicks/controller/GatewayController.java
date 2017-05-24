@@ -1,7 +1,6 @@
 package com.makeurpicks.controller;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,11 +24,8 @@ import com.makeurpicks.domain.ViewPickColumn;
 import com.makeurpicks.domain.ViewPicks;
 import com.makeurpicks.service.GatewayService;
 import com.makeurpicks.service.game.GameIntegrationService;
-import com.makeurpicks.service.game.GameView;
 import com.makeurpicks.service.league.LeagueIntegrationService;
-import com.makeurpicks.service.league.PlayerView;
 import com.makeurpicks.service.pick.PickIntegrationService;
-import com.makeurpicks.service.pick.PickView;
 import com.makeurpicks.service.week.WeekIntegrationService;
 
 import rx.Observable;
@@ -78,10 +74,10 @@ public class GatewayController {
 	}
 	
 	@RequestMapping(value="/viewpicks/leagueid/{leagueid}/weekid/{weekid}")
-	public @ResponseBody DeferredResult<List<List<ViewPickColumn>>> getPlayersPlusWinsInLeague(@PathVariable String leagueid, @PathVariable String weekid) 
+	public @ResponseBody DeferredResult<List<List<ViewPickColumn>>> getPlayersPlusWinsInLeague(@PathVariable String leagueid, @PathVariable String weekid, Principal loggedIn) 
 	{
 		DeferredResult<List<List<ViewPickColumn>>> result = new DeferredResult<>();
-		gatewayService.getPlayersPlusWinsInLeague(leagueid, weekid).subscribe(new Observer<List<List<ViewPickColumn>>>() {
+		gatewayService.getPlayersPlusWinsInLeague(leagueid, weekid, loggedIn.getName()).subscribe(new Observer<List<List<ViewPickColumn>>>() {
             @Override
             public void onCompleted() {
             }
