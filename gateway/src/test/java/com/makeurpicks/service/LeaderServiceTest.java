@@ -323,7 +323,7 @@ public class LeaderServiceTest {
 		when(teamClientMock.getTeams()).thenReturn(Observable.just(teamMap));
 		
 		TestSubscriber<List<List<ViewPickColumn>>> testSubscriber = new TestSubscriber<>();
-		gatewayService.getPlayersPlusWinsInLeague(leagueId, weekId).subscribe(testSubscriber);
+		gatewayService.getPlayersPlusWinsInLeague(leagueId, weekId, "player1").subscribe(testSubscriber);
 		
 		testSubscriber.assertNoErrors();
 		List<List<ViewPickColumn>> rows = testSubscriber.getOnNextEvents().get(0);

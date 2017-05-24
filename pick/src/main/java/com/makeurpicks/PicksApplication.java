@@ -3,7 +3,6 @@ package com.makeurpicks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.oauth2.client.EnableOAuth2Sso;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
@@ -27,21 +26,7 @@ import org.springframework.web.client.RestTemplate;
 @EnableResourceServer
 public class PicksApplication {
 	
-	
-	@LoadBalanced
-	@Bean(name={"loadBalancedRestTemplate"})
-	RestTemplate restTemplate() {
-		return new RestTemplate();
-	}
-	@Autowired
-	AuthorizationCodeResourceDetails oAuth2ProtectedResourceDetails;
-	@Autowired
-	OAuth2ClientContext oAuth2ClientContext;
-	@LoadBalanced
-	@Bean
-	public OAuth2RestOperations securerestTemplate() {
-		return new OAuth2RestTemplate(oAuth2ProtectedResourceDetails, oAuth2ClientContext);
-	}
+
 
     public static void main(String[] args) {
         SpringApplication.run(PicksApplication.class, args);
